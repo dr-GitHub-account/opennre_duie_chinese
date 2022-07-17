@@ -18,7 +18,7 @@ output_time=${time}
 #     --test_ckpt /home/user/xiongdengrui/opennre/OpenNRE/work_dirs/20220519225232_1/best.pth.tar
 # done
 
-for repeat in bbc_attempt;
+for repeat in bbc_analyze_getitem;
 do
 CUDA_VISIBLE_DEVICES=0 python example/train_duie_chinese_bert_softmax.py \
     --output_time ${output_time} \

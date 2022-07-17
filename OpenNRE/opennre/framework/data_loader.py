@@ -6,6 +6,8 @@ import random
 import json
 import sklearn.metrics
 
+import logging
+
 class SentenceREDataset(data.Dataset):
     """
     Sentence-level relation extraction dataset
@@ -36,13 +38,22 @@ class SentenceREDataset(data.Dataset):
                 self.data.append(eval(line))
         f.close()
         
+        self.flag = 0
+        
     def __len__(self):
         return len(self.data)
     
     def __getitem__(self, index):
+        # 从self.data列表中按index切片，取到对应元素，具体的操作在dataloader中
         item = self.data[index]
         seq = list(self.tokenizer(item, **self.kwargs))
         res = [self.rel2id[item['relation']]] + seq
+        if self.flag == 0:
+            self.flag = 1
+            # 输出几对item-seq，取决于SentenceRELoader的num_workers设置为几
+            logging.info("item: {}".format(item))
+            logging.info("seq: {}".format(seq))
+            
         return [self.rel2id[item['relation']]] + seq # label, seq1, seq2, ...
     
     def collate_fn(data):
@@ -117,6 +128,18 @@ def SentenceRELoader(path, rel2id, tokenizer, batch_size,
             num_workers=num_workers,
             collate_fn=collate_fn)
     return data_loader
+
+# def SentenceRELoader(path, rel2id, tokenizer, batch_size, 
+#         shuffle, num_workers=1, collate_fn=SentenceREDataset.collate_fn, **kwargs):
+#     dataset = SentenceREDataset(path = path, rel2id = rel2id, tokenizer = tokenizer, kwargs=kwargs)
+#     data_loader = data.DataLoader(dataset=dataset,
+#             batch_size=batch_size,
+#             shuffle=shuffle,
+#             # pin_memory=True,
+#             pin_memory=False,
+#             num_workers=num_workers,
+#             collate_fn=collate_fn)
+#     return data_loader
 
 class BagREDataset(data.Dataset):
     """

@@ -37,6 +37,10 @@ class SentenceRE(nn.Module):
         super().__init__()
         self.max_epoch = max_epoch
         # Load data
+        # model.sentence_encoder.tokenize是bert_encoder中定义在类里面的方法，
+        # 函数SentenceRELoader中，
+        # dataset = SentenceREDataset(path = path, rel2id = rel2id, tokenizer = tokenizer, kwargs=kwargs)
+        # 用model.sentence_encoder.tokenize来得到dataset，进而进行分批等操作得到data_loader
         if train_path != None:
             self.train_loader = SentenceRELoader(
                 train_path,

@@ -61,7 +61,7 @@ rel2id = json.load(open(os.path.join(root_path, 'benchmark/duie/duie_re_1_spo_no
 sentence_encoder = opennre.encoder.BERTEncoder(
     max_length=200, 
     # pretrain_path=os.path.join(root_path, 'pretrain/chinese_wwm_pytorch'),
-    pretrain_path=os.path.join(root_path, 'pretrain/bert-base-chinese'),
+    pretrain_path=os.path.join(root_path, 'pretrain/bert-base-chinese-no-jieba-linear-x10LR'),
     mask_entity=args.mask_entity
 )
 
@@ -83,7 +83,7 @@ framework = opennre.framework.SentenceRE(
     model=model,
     ckpt=ckpt,
     batch_size=32, # Modify the batch size w.r.t. your device
-    max_epoch=8,
+    max_epoch=12,
     lr=2e-5,
     opt='adamw'
 )
