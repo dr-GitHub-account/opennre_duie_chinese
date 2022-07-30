@@ -17,6 +17,8 @@ class SoftmaxNN(SentenceRE):
         super().__init__()
         self.sentence_encoder = sentence_encoder
         self.num_class = num_class
+        # 对于BERTEncoder，是nn.Linear(768, num_class)
+        # 对于BERTEncoder，是nn.Linear(768 * 2, num_class)
         self.fc = nn.Linear(self.sentence_encoder.hidden_size, num_class)
         self.softmax = nn.Softmax(-1)
         self.rel2id = rel2id
@@ -42,7 +44,11 @@ class SoftmaxNN(SentenceRE):
         Return:
             logits, (B, N)
         """
+        # 对于BERTEncoder，rep维度是(batch_size, 768)
+        # 对于BERTEntityEncoder，rep维度是(batch_size, 768 * 2)
         rep = self.sentence_encoder(*args) # (B, H)
         rep = self.drop(rep)
+        # 对于BERTEncoder，self.fc是nn.Linear(768, num_class)
+        # 对于BERTEncoder，self.fc是nn.Linear(768 * 2, num_class)
         logits = self.fc(rep) # (B, N)
         return logits

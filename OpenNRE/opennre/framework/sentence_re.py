@@ -121,6 +121,8 @@ class SentenceRE(nn.Module):
             logging.info("=== Epoch %d train ===" % epoch)
             avg_loss = AverageMeter()
             avg_acc = AverageMeter()
+            
+            # self.train_loader是可迭代的DataLoader类对象，已经经过tokenize(包括加入实体特殊记号)，关系已经转化为id
             t = tqdm(self.train_loader)
             # 遍历每个batch
             for iter, data in enumerate(t):

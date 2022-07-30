@@ -25,9 +25,9 @@ output_time=${time}
 #     --repeat ${repeat}
 # done
 
-for repeat in bbc_bee_3;
+for repeat in bbc_analyze_bee;
 do
-CUDA_VISIBLE_DEVICES=0 python example/train_duie_chinese_bert_softmax.py \
+CUDA_VISIBLE_DEVICES=1 python example/train_duie_chinese_bert_softmax_1.py \
     --output_time ${output_time} \
     --repeat ${repeat}
 done

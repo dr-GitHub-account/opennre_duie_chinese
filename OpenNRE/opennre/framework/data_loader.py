@@ -48,11 +48,67 @@ class SentenceREDataset(data.Dataset):
         item = self.data[index]
         seq = list(self.tokenizer(item, **self.kwargs))
         res = [self.rel2id[item['relation']]] + seq
-        if self.flag == 0:
-            self.flag = 1
-            # 输出几对item-seq，取决于SentenceRELoader的num_workers设置为几
-            logging.info("item: {}".format(item))
-            logging.info("seq: {}".format(seq))
+        # if self.flag == 0:
+        #     self.flag = 1
+        #     # 输出几对item-seq，取决于SentenceRELoader的num_workers设置为几
+        #     logging.info("item: {}".format(item))
+        #     logging.info("seq: {}".format(seq))
+            
+        # BertEncoder的例子：
+        # item: {'token': ['最', '新', '电', '影', '《', '夺', '路', '而', '逃', '》', '张', '一', '山', '角', '色', '大', '曝', '光'], 'h': {'name': '夺路而逃', 'pos': [5, 8]}, 't': {'name': '张一山', 'pos': [10, 12]}, 'relation': '主演'}
+        # seq: [tensor([[ 101, 3297, 3173, 4510, 2512,  517,  100, 1932, 6662, 5445,    2, 6845,
+        #         518,    1, 2476,  671,    3, 2255, 6235, 5682, 1920, 3284, 1045,  102,
+        #             0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
+        #             0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
+        #             0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
+        #             0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
+        #             0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
+        #             0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
+        #             0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
+        #             0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
+        #             0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
+        #             0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
+        #             0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
+        #             0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
+        #             0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
+        #             0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
+        #             0,    0,    0,    0,    0,    0,    0,    0]]), tensor([[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+        #         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        #         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        #         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        #         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        #         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        #         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        #         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        #         0, 0, 0, 0, 0, 0, 0, 0]])]
+        
+        # BertEntityEncoder的例子(tensor([[2]]), tensor([[33]])分别表示加入特殊字符后，头部实体和尾部实体在句子中所处的位置)：        
+        # item: {'token': ['《', '奇', '趣', '海', '洋', '动', '物', '》', '是', '2', '0', '1', '1', '年', '少', '年', '儿', '童', '出', '版', '社', '出', '版', '的', '图', '书', '，', '作', '者', '是', '雷', '宗', '友'], 'h': {'name': '奇趣海洋动物', 'pos': [1, 6]}, 't': {'name': '雷宗友', 'pos': [30, 32]}, 'relation': '作者'}
+        # seq: [tensor([[ 101,  517,  100, 1936, 6637, 3862, 3817, 1220,    2, 4289,  518, 3221,
+        #           123,  121,  122,  122, 2399, 2208, 2399, 1036, 4997, 1139, 4276, 4852,
+        #          1139, 4276, 4638, 1745,  741, 8024,  868, 5442, 3221,    1, 7440, 2134,
+        #             3, 1351,  102,    0,    0,    0,    0,    0,    0,    0,    0,    0,
+        #             0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
+        #             0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
+        #             0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
+        #             0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
+        #             0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
+        #             0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
+        #             0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
+        #             0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
+        #             0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
+        #             0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
+        #             0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
+        #             0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
+        #             0,    0,    0,    0,    0,    0,    0,    0]]), tensor([[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+        #          1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        #          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        #          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        #          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        #          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        #          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        #          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        #          0, 0, 0, 0, 0, 0, 0, 0]]), tensor([[2]]), tensor([[33]])]
             
         return [self.rel2id[item['relation']]] + seq # label, seq1, seq2, ...
     
@@ -117,20 +173,8 @@ class SentenceREDataset(data.Dataset):
         micro_f1 = 2 * micro_p * micro_r / (micro_p + micro_r)
         return {'acc': acc, 'micro_p': micro_p, 'micro_r': micro_r, 'micro_f1': micro_f1}
     
-def SentenceRELoader(path, rel2id, tokenizer, batch_size, 
-        shuffle, num_workers=8, collate_fn=SentenceREDataset.collate_fn, **kwargs):
-    dataset = SentenceREDataset(path = path, rel2id = rel2id, tokenizer = tokenizer, kwargs=kwargs)
-    data_loader = data.DataLoader(dataset=dataset,
-            batch_size=batch_size,
-            shuffle=shuffle,
-            # pin_memory=True,
-            pin_memory=False,
-            num_workers=num_workers,
-            collate_fn=collate_fn)
-    return data_loader
-
 # def SentenceRELoader(path, rel2id, tokenizer, batch_size, 
-#         shuffle, num_workers=1, collate_fn=SentenceREDataset.collate_fn, **kwargs):
+#         shuffle, num_workers=8, collate_fn=SentenceREDataset.collate_fn, **kwargs):
 #     dataset = SentenceREDataset(path = path, rel2id = rel2id, tokenizer = tokenizer, kwargs=kwargs)
 #     data_loader = data.DataLoader(dataset=dataset,
 #             batch_size=batch_size,
@@ -140,6 +184,18 @@ def SentenceRELoader(path, rel2id, tokenizer, batch_size,
 #             num_workers=num_workers,
 #             collate_fn=collate_fn)
 #     return data_loader
+
+def SentenceRELoader(path, rel2id, tokenizer, batch_size, 
+        shuffle, num_workers=1, collate_fn=SentenceREDataset.collate_fn, **kwargs):
+    dataset = SentenceREDataset(path = path, rel2id = rel2id, tokenizer = tokenizer, kwargs=kwargs)
+    data_loader = data.DataLoader(dataset=dataset,
+            batch_size=batch_size,
+            shuffle=shuffle,
+            # pin_memory=True,
+            pin_memory=False,
+            num_workers=num_workers,
+            collate_fn=collate_fn)
+    return data_loader
 
 class BagREDataset(data.Dataset):
     """
